@@ -277,9 +277,23 @@ async function syncDatabaseFromCloud() {
             const result = await res.json();
             if (result.status === 'SUCCESS' && result.data) {
                 const stmt = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
-                const tx = db.transaction((configObj) => {
-                    for (const [key, value] of Object.entries(configObj)) {
-                        stmt.run(key, String(value || ''));
+                const tx = db.transaction((data) => {
+                    if (Array.isArray(data)) {
+                        // Jika Google Apps Script mengembalikan array [{key: "App_Name", value: "KlikSurat"}] atau [{App_Name: "KlikSurat"}]
+                        for (const item of data) {
+                            if (item.key !== undefined && item.value !== undefined) {
+                                stmt.run(item.key, String(item.value || ''));
+                            } else {
+                                for (const [k, v] of Object.entries(item)) {
+                                    stmt.run(k, String(v || ''));
+                                }
+                            }
+                        }
+                    } else if (typeof data === 'object') {
+                        // Jika kembalian berupa object langsung { App_Name: "KlikSurat", NPSN: "123" }
+                        for (const [key, value] of Object.entries(data)) {
+                            stmt.run(key, String(value || ''));
+                        }
                     }
                 });
                 tx(result.data);

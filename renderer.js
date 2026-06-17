@@ -265,12 +265,25 @@ function muatAwalSeluruhKonfigurasi(silent = false) {
             if (!silent) setLoading(false);
             if (!config) return;
 
+            // [LOG DEBUG] Untuk membantu pengecekan data
+            console.log("=== [DEBUG] DATA PENGATURAN DARI DATABASE ===");
+            console.log("Data yang diterima Frontend:", config);
+            console.log("=============================================");
+
             if (document.getElementById('in_app_name')) document.getElementById('in_app_name').value = config.App_Name || "KlikSurat";
             if (document.getElementById('in_npsn_sekolah')) document.getElementById('in_npsn_sekolah').value = config.NPSN_Sekolah || "";
             if (document.getElementById('in_kode_provinsi')) document.getElementById('in_kode_provinsi').value = config.Kode_Provinsi || "35";
             if (document.getElementById('in_kode_kabupaten')) document.getElementById('in_kode_kabupaten').value = config.Kode_Kabupaten || "09";
             if (document.getElementById('in_kode_dinas')) document.getElementById('in_kode_dinas').value = config.Kode_Dinas || "310";
             if (document.getElementById('in_kode_kecamatan')) document.getElementById('in_kode_kecamatan').value = config.Kode_Kecamatan || "24";
+
+            if (document.getElementById('set_app_name')) document.getElementById('set_app_name').value = config.App_Name || "KlikSurat";
+            if (document.getElementById('set_npsn_sekolah')) document.getElementById('set_npsn_sekolah').value = config.NPSN_Sekolah || "";
+            if (document.getElementById('set_kode_provinsi')) document.getElementById('set_kode_provinsi').value = config.Kode_Provinsi || "35";
+            if (document.getElementById('set_kode_kabupaten')) document.getElementById('set_kode_kabupaten').value = config.Kode_Kabupaten || "09";
+            if (document.getElementById('set_kode_dinas')) document.getElementById('set_kode_dinas').value = config.Kode_Dinas || "310";
+            if (document.getElementById('set_kode_kecamatan')) document.getElementById('set_kode_kecamatan').value = config.Kode_Kecamatan || "24";
+
             if (document.getElementById('in_kop_daerah')) document.getElementById('in_kop_daerah').value = config.Kop_Daerah || "";
             if (document.getElementById('in_kop_sub')) document.getElementById('in_kop_sub').value = config.Kop_Sub || config.Kop_Sub_Dinas || "";
             if (document.getElementById('in_kop_sekolah')) document.getElementById('in_kop_sekolah').value = config.Kop_Sekolah || "";
@@ -1111,12 +1124,20 @@ function simpanProfilBaru() {
 }
 
 function simpanSettingsUmum() {
-    const appName = document.getElementById('in_app_name').value;
-    const npsnSekolah = (document.getElementById('in_npsn_sekolah')?.value || "").replace(/\D/g, "");
-    const kodeProvinsi = document.getElementById('in_kode_provinsi')?.value || "35";
-    const kodeKabupaten = document.getElementById('in_kode_kabupaten')?.value || "09";
-    const kodeDinas = document.getElementById('in_kode_dinas')?.value || "310";
-    const kodeKecamatan = document.getElementById('in_kode_kecamatan')?.value || "24";
+    const appName = document.getElementById('set_app_name').value;
+    const npsnSekolah = (document.getElementById('set_npsn_sekolah')?.value || "").replace(/\D/g, "");
+    const kodeProvinsi = document.getElementById('set_kode_provinsi')?.value || "35";
+    const kodeKabupaten = document.getElementById('set_kode_kabupaten')?.value || "09";
+    const kodeDinas = document.getElementById('set_kode_dinas')?.value || "310";
+    const kodeKecamatan = document.getElementById('set_kode_kecamatan')?.value || "24";
+
+    if (document.getElementById('in_app_name')) document.getElementById('in_app_name').value = appName;
+    if (document.getElementById('in_npsn_sekolah')) document.getElementById('in_npsn_sekolah').value = npsnSekolah;
+    if (document.getElementById('in_kode_provinsi')) document.getElementById('in_kode_provinsi').value = kodeProvinsi;
+    if (document.getElementById('in_kode_kabupaten')) document.getElementById('in_kode_kabupaten').value = kodeKabupaten;
+    if (document.getElementById('in_kode_dinas')) document.getElementById('in_kode_dinas').value = kodeDinas;
+    if (document.getElementById('in_kode_kecamatan')) document.getElementById('in_kode_kecamatan').value = kodeKecamatan;
+
     const logoL = document.getElementById('in_logo_kiri').value; const logoR = document.getElementById('in_logo_kanan').value;
     if (npsnSekolah && npsnSekolah.length !== 8) { if (typeof tampilkanToast === "function") tampilkanToast("error", "NPSN TIDAK VALID", "NPSN sekolah harus berisi 8 digit angka."); return; }
     setLoading(true, "Memperbarui sistem...");
