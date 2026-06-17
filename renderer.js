@@ -132,14 +132,14 @@ function handleLogin(e) {
                 const dataSesi = { terautentikasi: true, nama: res.nama, role: res.role, username: res.username };
                 localStorage.setItem("kliksurat_sd_session", JSON.stringify(dataSesi));
                 aktifkanSesiDashboard(res.nama, res.role, res.username);
-                if(typeof tampilkanToast === "function") tampilkanToast("success", "AKSES DIBERIKAN", "Selamat datang kembali, " + res.nama);
+                if (typeof tampilkanToast === "function") tampilkanToast("success", "AKSES DIBERIKAN", "Selamat datang kembali, " + res.nama);
             } else {
-                if(typeof tampilkanToast === "function") tampilkanToast("error", "AKSES DITOLAK", res ? res.message : "Terjadi kesalahan sistem.");
+                if (typeof tampilkanToast === "function") tampilkanToast("error", "AKSES DITOLAK", res ? res.message : "Terjadi kesalahan sistem.");
             }
         })
         .catch(function (err) {
             setLoading(false);
-            if(typeof tampilkanToast === "function") tampilkanToast("error", "ERROR SERVER", err.toString());
+            if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR SERVER", err.toString());
         });
 }
 
@@ -258,7 +258,7 @@ function muatAwalSeluruhKonfigurasi(silent = false) {
     if (typeof applySavedTheme === "function") applySavedTheme();
 
     if (!silent) setLoading(true, "Sinkronisasi Database...");
-    
+
     // [MODIFIKASI ELECTRON] Load config pakai IPC Renderer
     window.electronAPI.ambilPengaturan()
         .then(function (config) {
@@ -323,7 +323,7 @@ function muatAwalSeluruhKonfigurasi(silent = false) {
 
             sinkronisasiLayoutKonfigurasi();
             if (typeof ubahModeLayoutTtd === "function") ubahModeLayoutTtd(config.Ttd_Mode_Aktif || "kanan-bawah");
-            
+
             const printArea = document.getElementById('print-area');
             if (printArea) printArea.dataset.pageCount = "0";
 
@@ -388,7 +388,7 @@ function sinkronisasiLayoutKonfigurasi() {
 // =============================================================
 // LIVE PREVIEW ENGINE (SINKRONISASI FORM KE KERTAS)
 // =============================================================
-let webAppUrl = ""; 
+let webAppUrl = "";
 let lastSidForShortening = "";
 let shortUrlCache = "";
 let qrPreviewCache = { text: "", src: "" };
@@ -436,7 +436,7 @@ function cetakPreviewTerisolasi() {
 
     const frameDoc = printFrame.contentWindow.document;
     frameDoc.open();
-    
+
     const content = `<!DOCTYPE html>
 <html lang="id">
 <head>
@@ -463,7 +463,7 @@ function cetakPreviewTerisolasi() {
 </head>
 <body>${clonedPrintArea.outerHTML}</body>
 </html>`;
-    
+
     frameDoc.write(content);
     frameDoc.close();
 
@@ -871,9 +871,9 @@ function menjalankanUpdatePreviewLangsung() {
         </div>`;
         finalBlock.appendChild(footerBlock);
         currentContent.appendChild(finalBlock);
-        
+
         if (typeof renderQRCodeVerifikasiInto === "function") renderQRCodeVerifikasiInto(footerBlock);
-        
+
         if (currentContent.scrollHeight - getInnerHeight() > 24 && currentContent.children.length > 1) {
             currentContent.removeChild(finalBlock); appendNewPage(); currentContent.appendChild(finalBlock);
         }
@@ -959,7 +959,7 @@ function renderKomponenSpesimenTtd(targetEl) {
     const materaiHtml = pakaiMaterai ? `<div class="absolute left-0 top-1/2 -translate-y-1/2 -rotate-12 border-2 border-dashed border-slate-300 p-2 text-[7pt] text-slate-400 font-bold leading-none select-none text-center z-10 bg-white/50">TEMPEL<br>MATERAI<br>10.000</div>` : "";
     const fotoHtml = pakaiFoto ? `<div class="shrink-0 border border-black flex items-center justify-center text-[7pt] text-slate-400 font-bold mb-6" style="width: 30mm; height: 40mm; margin-right: 15px;">PAS FOTO 3X4</div>` : "";
     const alignClass = isCentered ? 'text-left' : 'text-center';
-    
+
     let prefixDitetapkan = "";
     if (isCentered) {
         if (frasaDitetapkan.trim() === "" && frasaTanggal.trim() === "") {
@@ -1007,7 +1007,7 @@ function prosesUnggahLogoKeDrive(posisi) {
         document.getElementById('modal-cropper').classList.remove('hidden');
         if (cropperInstance) cropperInstance.destroy();
         const CropperLib = window.Cropper || Cropper;
-        if (typeof CropperLib === 'undefined') { if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL MEMUAT", "Library pemotong gambar belum siap."); return; }
+        if (typeof CropperLib === 'undefined') { if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL MEMUAT", "Library pemotong gambar belum siap."); return; }
         cropperInstance = new CropperLib(imgElement, { aspectRatio: NaN, viewMode: 1, autoCropArea: 0.8, center: true, highlight: false, cropBoxMovable: true, cropBoxResizable: true });
         document.getElementById('btn-do-crop').onclick = function () {
             const canvas = cropperInstance.getCroppedCanvas({ width: 500, height: 600, imageSmoothingEnabled: true, imageSmoothingQuality: 'high' });
@@ -1037,45 +1037,45 @@ function lakukanUploadLogoFinal(mimeType, base64Data, posisi) {
                     if (document.getElementById('brand-logo-nav')) document.getElementById('brand-logo-nav').src = logoWithBuster;
                     if (document.getElementById('app-logo-login')) document.getElementById('app-logo-login').src = logoWithBuster;
                 }
-                if(typeof updateLivePreview === "function") updateLivePreview();
+                if (typeof updateLivePreview === "function") updateLivePreview();
                 let dataOtoSimpan = {}; dataOtoSimpan[posisi === 'left' ? "Logo_Kiri_Url" : "Logo_Kanan_Url"] = response.url;
                 window.electronAPI.simpanPengaturanKop(dataOtoSimpan).then(() => {
-                    setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("success", "BERHASIL", `Logo ${posisi} diunggah.`);
-                }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); });
+                    setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("success", "BERHASIL", `Logo ${posisi} diunggah.`);
+                }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
             } else {
-                setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", response ? response.message : "Gagal mengunggah gambar.");
+                setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", response ? response.message : "Gagal mengunggah gambar.");
             }
         })
-        .catch(function (err) { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "CRITICAL ERROR", err.toString()); });
+        .catch(function (err) { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "CRITICAL ERROR", err.toString()); });
 }
 
 function simpanKopKeDatabase() {
     setLoading(true, "Simpan Kop diproses...");
     const dataKop = {
-        "App_Name": document.getElementById('in_app_name') ? document.getElementById('in_app_name').value : "KlikSurat", 
+        "App_Name": document.getElementById('in_app_name') ? document.getElementById('in_app_name').value : "KlikSurat",
         "Kop_Daerah": document.getElementById('in_kop_daerah').value,
-        "Kop_Sub_Dinas": document.getElementById('in_kop_sub').value, 
+        "Kop_Sub_Dinas": document.getElementById('in_kop_sub').value,
         "Kop_Sekolah": document.getElementById('in_kop_sekolah').value,
-        "Kop_Alamat": document.getElementById('in_kop_alamat').value, 
+        "Kop_Alamat": document.getElementById('in_kop_alamat').value,
         "Kop_Kontak": document.getElementById('in_kop_kontak').value,
-        "Line_Spacing": document.getElementById('in_line_spacing').value, 
+        "Line_Spacing": document.getElementById('in_line_spacing').value,
         "Ukuran_Kertas": document.getElementById('in_ukuran_kertas').value,
-        "Ukuran_Font": document.getElementById('in_ukuran_font').value, 
+        "Ukuran_Font": document.getElementById('in_ukuran_font').value,
         "Pilihan_Font": document.getElementById('in_pilihan_font').value,
-        "Satuan_Margin": document.getElementById('in_satuan_margin').value, 
+        "Satuan_Margin": document.getElementById('in_satuan_margin').value,
         "Margin_Atas": document.getElementById('in_margin_atas').value,
-        "Margin_Bawah": document.getElementById('in_margin_bawah').value, 
-        "Margin_Kiri": document.getElementById('in_margin_kiri').value, 
+        "Margin_Bawah": document.getElementById('in_margin_bawah').value,
+        "Margin_Kiri": document.getElementById('in_margin_kiri').value,
         "Margin_Kanan": document.getElementById('in_margin_kanan').value,
-        "Kode_Provinsi": document.getElementById('in_kode_provinsi') ? document.getElementById('in_kode_provinsi').value : "35", 
+        "Kode_Provinsi": document.getElementById('in_kode_provinsi') ? document.getElementById('in_kode_provinsi').value : "35",
         "Kode_Kabupaten": document.getElementById('in_kode_kabupaten') ? document.getElementById('in_kode_kabupaten').value : "09",
-        "Kode_Dinas": document.getElementById('in_kode_dinas') ? document.getElementById('in_kode_dinas').value : "310", 
+        "Kode_Dinas": document.getElementById('in_kode_dinas') ? document.getElementById('in_kode_dinas').value : "310",
         "Kode_Kecamatan": document.getElementById('in_kode_kecamatan') ? document.getElementById('in_kode_kecamatan').value : "24",
         "NPSN_Sekolah": document.getElementById('in_npsn_sekolah') ? document.getElementById('in_npsn_sekolah').value.replace(/\D/g, "") : "20523730"
     };
     window.electronAPI.simpanPengaturanKop(dataKop).then(res => {
-        setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast(res.status === "SUCCESS" ? "success" : "error", res.status === "SUCCESS" ? "BERHASIL" : "GAGAL", res.message);
-    }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); });
+        setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast(res.status === "SUCCESS" ? "success" : "error", res.status === "SUCCESS" ? "BERHASIL" : "GAGAL", res.message);
+    }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
 }
 
 function bukaModalProfile() {
@@ -1090,24 +1090,24 @@ function tutupModalProfile() { document.getElementById('modal-profile').classLis
 
 function simpanProfilBaru() {
     const dataProfil = { nama: document.getElementById('prof_nama').value.trim(), username: document.getElementById('prof_username').value.trim(), password: document.getElementById('prof_password').value.trim() };
-    if (!dataProfil.nama || !dataProfil.username) { if(typeof tampilkanToast==="function") tampilkanToast("error", "DATA KOSONG", "Nama dan Username harus diisi."); return; }
+    if (!dataProfil.nama || !dataProfil.username) { if (typeof tampilkanToast === "function") tampilkanToast("error", "DATA KOSONG", "Nama dan Username harus diisi."); return; }
     setLoading(true, "Memperbarui Akun...");
     window.electronAPI.perbaruiProfilUser(userSessionUsername, dataProfil).then(res => {
         setLoading(false);
         if (res.status === "SUCCESS") {
             const isCredentialChanged = dataProfil.username !== userSessionUsername || dataProfil.password !== "";
             if (isCredentialChanged && typeof Swal !== 'undefined') {
-                Swal.fire({ icon: 'success', title: 'Keamanan Diperbarui', text: 'Sistem akan mengeluarkan Anda secara otomatis.', confirmButtonColor: '#0284c7', allowOutsideClick: false }).then(() => { if(typeof prosesLogoutSistem==="function") prosesLogoutSistem(); });
+                Swal.fire({ icon: 'success', title: 'Keamanan Diperbarui', text: 'Sistem akan mengeluarkan Anda secara otomatis.', confirmButtonColor: '#0284c7', allowOutsideClick: false }).then(() => { if (typeof prosesLogoutSistem === "function") prosesLogoutSistem(); });
             } else {
-                if(typeof tampilkanToast==="function") tampilkanToast("success", "PROFIL DIPERBARUI", res.message);
+                if (typeof tampilkanToast === "function") tampilkanToast("success", "PROFIL DIPERBARUI", res.message);
                 userSessionName = dataProfil.nama;
                 let sesi = JSON.parse(localStorage.getItem("kliksurat_sd_session") || "{}");
                 if (sesi) { sesi.nama = userSessionName; sesi.username = userSessionUsername; localStorage.setItem("kliksurat_sd_session", JSON.stringify(sesi)); }
                 document.getElementById('user-profile').innerHTML = `<i class="fa fa-user-circle"></i> ${userSessionName}`;
-                if(typeof tutupModalProfile==="function") tutupModalProfile();
+                if (typeof tutupModalProfile === "function") tutupModalProfile();
             }
-        } else { if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", res.message); }
-    }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); });
+        } else { if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", res.message); }
+    }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
 }
 
 function simpanSettingsUmum() {
@@ -1118,23 +1118,23 @@ function simpanSettingsUmum() {
     const kodeDinas = document.getElementById('in_kode_dinas')?.value || "310";
     const kodeKecamatan = document.getElementById('in_kode_kecamatan')?.value || "24";
     const logoL = document.getElementById('in_logo_kiri').value; const logoR = document.getElementById('in_logo_kanan').value;
-    if (npsnSekolah && npsnSekolah.length !== 8) { if(typeof tampilkanToast==="function") tampilkanToast("error", "NPSN TIDAK VALID", "NPSN sekolah harus berisi 8 digit angka."); return; }
+    if (npsnSekolah && npsnSekolah.length !== 8) { if (typeof tampilkanToast === "function") tampilkanToast("error", "NPSN TIDAK VALID", "NPSN sekolah harus berisi 8 digit angka."); return; }
     setLoading(true, "Memperbarui sistem...");
     window.electronAPI.simpanPengaturanKop({ "App_Name": appName, "NPSN_Sekolah": npsnSekolah, "Kode_Provinsi": kodeProvinsi, "Kode_Kabupaten": kodeKabupaten, "Kode_Dinas": kodeDinas, "Kode_Kecamatan": kodeKecamatan, "Logo_Kiri_Url": logoL, "Logo_Kanan_Url": logoR }).then(res => {
         setLoading(false);
         if (res.status === "SUCCESS") {
-            if(typeof tampilkanToast==="function") tampilkanToast("success", "SISTEM DIPERBARUI", "Nama aplikasi dan logo telah disimpan.");
-            if(typeof tutupModalSettings==="function") tutupModalSettings();
-            if(typeof refreshUIIdentity==="function") refreshUIIdentity(appName, logoR || logoL || "");
-        } else { if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", res.message); }
-    }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); });
+            if (typeof tampilkanToast === "function") tampilkanToast("success", "SISTEM DIPERBARUI", "Nama aplikasi dan logo telah disimpan.");
+            if (typeof tutupModalSettings === "function") tutupModalSettings();
+            if (typeof refreshUIIdentity === "function") refreshUIIdentity(appName, logoR || logoL || "");
+        } else { if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", res.message); }
+    }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
 }
 
 function loadKodeKlasifikasiSurat() {
     const select = document.getElementById('in_kode_klasifikasi'); const listBox = document.getElementById('daftar-kode-klasifikasi');
     if (!select && !listBox) return;
     window.electronAPI.ambilKodeKlasifikasiSurat().then(data => {
-        window.cacheKodeKlasifikasi = data || []; if(typeof renderKodeKlasifikasiSurat==="function") renderKodeKlasifikasiSurat(window.cacheKodeKlasifikasi);
+        window.cacheKodeKlasifikasi = data || []; if (typeof renderKodeKlasifikasiSurat === "function") renderKodeKlasifikasiSurat(window.cacheKodeKlasifikasi);
     }).catch(err => console.warn("Gagal memuat kode klasifikasi:", err));
 }
 
@@ -1142,7 +1142,7 @@ function renderKodeKlasifikasiSurat(data) {
     const select = document.getElementById('in_kode_klasifikasi');
     const listBox = document.getElementById('daftar-kode-klasifikasi');
     const escapeText = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-    const items = (data && data.length) ? data : [ { kode: "400.3.5", nama: "Administrasi Sekolah" }, { kode: "005", nama: "Undangan" } ];
+    const items = (data && data.length) ? data : [{ kode: "400.3.5", nama: "Administrasi Sekolah" }, { kode: "005", nama: "Undangan" }];
 
     if (select) {
         const currentValue = select.value;
@@ -1161,11 +1161,11 @@ function renderKodeKlasifikasiSurat(data) {
 }
 
 function hapusKlasifikasi(kode) {
-    if(typeof Swal === 'undefined') return;
+    if (typeof Swal === 'undefined') return;
     Swal.fire({ title: 'Hapus Kode?', text: `Hapus klasifikasi ${kode}?`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus' }).then(res => {
         if (res.isConfirmed) {
             setLoading(true, "Menghapus...");
-            window.electronAPI.hapusKodeKlasifikasi(kode).then(() => { loadKodeKlasifikasiSurat(); setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("success", "TERHAPUS", "Kode klasifikasi dihapus."); }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", err.toString()); });
+            window.electronAPI.hapusKodeKlasifikasi(kode).then(() => { loadKodeKlasifikasiSurat(); setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("success", "TERHAPUS", "Kode klasifikasi dihapus."); }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", err.toString()); });
         }
     });
 }
@@ -1173,16 +1173,16 @@ function hapusKlasifikasi(kode) {
 function tambahKodeKlasifikasiBaru() {
     const kodeEl = document.getElementById('in_kode_baru'); const namaEl = document.getElementById('in_nama_kode_baru');
     const kode = kodeEl?.value.trim() || ""; const nama = namaEl?.value.trim() || "";
-    if (!kode || !nama) { if(typeof tampilkanToast==="function") tampilkanToast("error", "DATA KOSONG", "Kode dan nama klasifikasi wajib diisi."); return; }
+    if (!kode || !nama) { if (typeof tampilkanToast === "function") tampilkanToast("error", "DATA KOSONG", "Kode dan nama klasifikasi wajib diisi."); return; }
     setLoading(true, "Menyimpan...");
     window.electronAPI.tambahKodeKlasifikasiSurat({ kode, nama }).then(res => {
         setLoading(false);
         if (res && res.status === "SUCCESS") {
             if (kodeEl) kodeEl.value = ""; if (namaEl) namaEl.value = "";
-            if(typeof tampilkanToast==="function") tampilkanToast("success", "KODE TERSIMPAN", res.message);
+            if (typeof tampilkanToast === "function") tampilkanToast("success", "KODE TERSIMPAN", res.message);
             loadKodeKlasifikasiSurat();
-        } else { if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", res ? res.message : "Gagal menyimpan."); }
-    }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); });
+        } else { if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", res ? res.message : "Gagal menyimpan."); }
+    }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
 }
 
 function simpanTtdKeDatabase() {
@@ -1199,21 +1199,21 @@ function simpanTtdKeDatabase() {
         setLoading(false);
         if (res && res.status === "SUCCESS") {
             window.configPejabat = { nama: dataTtd.Ttd_Nama_1, nip: dataTtd.Ttd_Nip_1, jabatan: dataTtd.Ttd_Jabatan_1, pangkat: dataTtd.Ttd_Pangkat_1 };
-            if(typeof tampilkanToast==="function") tampilkanToast("success", "BERHASIL", res.message); else if(typeof Swal!=='undefined') Swal.fire('Berhasil', res.message, 'success');
+            if (typeof tampilkanToast === "function") tampilkanToast("success", "BERHASIL", res.message); else if (typeof Swal !== 'undefined') Swal.fire('Berhasil', res.message, 'success');
         } else {
             const msg = res ? res.message : "Gagal menyimpan TTD.";
-            if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", msg); else if(typeof Swal!=='undefined') Swal.fire('Gagal', msg, 'error');
+            if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", msg); else if (typeof Swal !== 'undefined') Swal.fire('Gagal', msg, 'error');
         }
-    }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); else if(typeof Swal!=='undefined') Swal.fire('Error Sistem', err.toString(), 'error'); });
+    }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); else if (typeof Swal !== 'undefined') Swal.fire('Error Sistem', err.toString(), 'error'); });
 }
 
 function prosesSimpanData() {
     const packNomor = document.getElementById('in_nomor')?.value; const packPerihal = document.getElementById('in_perihal')?.value;
-    if (!packNomor || !packPerihal) { if(typeof Swal!=='undefined') Swal.fire({ icon: 'warning', title: 'Data Belum Lengkap', text: 'Nomor dan Perihal wajib diisi!', confirmButtonColor: '#0284c7' }); return; }
-    
+    if (!packNomor || !packPerihal) { if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Data Belum Lengkap', text: 'Nomor dan Perihal wajib diisi!', confirmButtonColor: '#0284c7' }); return; }
+
     const inSid = document.getElementById('in_serial_id');
-    if (inSid) { inSid.value = "V" + Math.random().toString(36).substring(2, 9).toUpperCase(); shortUrlCache = ""; lastSidForShortening = ""; if(typeof updateLivePreview==="function") updateLivePreview(); }
-    
+    if (inSid) { inSid.value = "V" + Math.random().toString(36).substring(2, 9).toUpperCase(); shortUrlCache = ""; lastSidForShortening = ""; if (typeof updateLivePreview === "function") updateLivePreview(); }
+
     const dataSuratMurni = {
         nomor: packNomor, tanggal: document.getElementById('in_tanggal')?.value || "", perihal: packPerihal, penerima: document.getElementById('in_penerima')?.value || "",
         lampiran: document.getElementById('in_lampiran')?.value || "", pembuka: document.getElementById('in_pembuka')?.value || "", isi: document.getElementById('in_isi')?.value || "",
@@ -1222,23 +1222,23 @@ function prosesSimpanData() {
     };
 
     const parts = dataSuratMurni.nomor.split('/');
-    if(parts.length < 2) { 
+    if (parts.length < 2) {
         // Fallback simpan jika format bukan urutan/tahun
-        eksekusiSimpanAkhir(dataSuratMurni); return; 
+        eksekusiSimpanAkhir(dataSuratMurni); return;
     }
     const urutan = parts[1]; const tahun = parts[parts.length - 1];
 
     window.electronAPI.cekNomorDuplikat(urutan, tahun).then(status => {
         if (status === "DUPLICATE" || status === "JUMP") {
-            if(typeof tampilkanToast==="function") tampilkanToast("warning", "NOMOR DISESUAIKAN", status === "DUPLICATE" ? `Nomor ${urutan} sudah ada. Menyesuaikan...` : `Nomor ${urutan} melompat. Menyesuaikan...`);
-            if(typeof mintaNomorOtomatis==="function") mintaNomorOtomatis(); return;
+            if (typeof tampilkanToast === "function") tampilkanToast("warning", "NOMOR DISESUAIKAN", status === "DUPLICATE" ? `Nomor ${urutan} sudah ada. Menyesuaikan...` : `Nomor ${urutan} melompat. Menyesuaikan...`);
+            if (typeof mintaNomorOtomatis === "function") mintaNomorOtomatis(); return;
         }
         eksekusiSimpanAkhir(dataSuratMurni);
     }).catch(() => { eksekusiSimpanAkhir(dataSuratMurni); });
 }
 
 function eksekusiSimpanAkhir(dataSuratMurni) {
-    if(typeof Swal === 'undefined') return;
+    if (typeof Swal === 'undefined') return;
     Swal.fire({ title: 'Simpan Arsip Surat?', text: "Surat akan dicatat ke log arsip.", icon: 'question', showCancelButton: true, confirmButtonColor: '#10b981', cancelButtonColor: '#64748b', confirmButtonText: 'Ya, Arsipkan' }).then((result) => {
         if (result.isConfirmed) {
             setLoading(true, "Mengarsipkan Surat...");
@@ -1255,7 +1255,7 @@ function eksekusiSimpanAkhir(dataSuratMurni) {
 }
 
 function tanyakanNamaTemplateOtomatis(dataSuratMurni) {
-    if(typeof Swal === 'undefined') return;
+    if (typeof Swal === 'undefined') return;
     Swal.fire({ title: 'Nama Master Template', input: 'text', showCancelButton: true, confirmButtonColor: '#0284c7', confirmButtonText: 'Simpan', inputValidator: (value) => { if (!value) return 'Nama template wajib diisi!'; } }).then((inputRes) => {
         if (inputRes.isConfirmed) {
             setLoading(true, "Mendaftarkan Template...");
@@ -1267,14 +1267,14 @@ function tanyakanNamaTemplateOtomatis(dataSuratMurni) {
 }
 
 function konfirmasiHapusSemuaTemplate() {
-    if(typeof Swal === 'undefined') return;
+    if (typeof Swal === 'undefined') return;
     Swal.fire({ title: 'Hapus Semua Template?', text: "Semua template akan dihapus permanen.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'Ya, Hapus Semua' }).then((result) => {
         if (result.isConfirmed) {
             setLoading(true, "Membersihkan database...");
             window.electronAPI.hapusSemuaTemplate().then(res => {
                 setLoading(false);
-                if (res.status === "SUCCESS") { if(typeof tampilkanToast==="function") tampilkanToast("success", "BERHASIL", res.message); if (typeof loadKoleksiDatabase === "function") loadKoleksiDatabase(); } else { if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", res.message); }
-            }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); });
+                if (res.status === "SUCCESS") { if (typeof tampilkanToast === "function") tampilkanToast("success", "BERHASIL", res.message); if (typeof loadKoleksiDatabase === "function") loadKoleksiDatabase(); } else { if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", res.message); }
+            }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
         }
     });
 }
@@ -1290,10 +1290,10 @@ function handleImporFile(event) {
             setLoading(true, "Mengimpor Template...");
             window.electronAPI.imporTemplatesBatch(importedData).then(res => {
                 setLoading(false);
-                if (res.status === "SUCCESS") { if(typeof Swal!=='undefined') Swal.fire('Impor Berhasil', res.message, 'success'); if (typeof loadKoleksiDatabase === "function") loadKoleksiDatabase(); } else { if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", res.message); }
+                if (res.status === "SUCCESS") { if (typeof Swal !== 'undefined') Swal.fire('Impor Berhasil', res.message, 'success'); if (typeof loadKoleksiDatabase === "function") loadKoleksiDatabase(); } else { if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", res.message); }
                 event.target.value = '';
-            }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); event.target.value = ''; });
-        } catch (err) { if(typeof Swal!=='undefined') Swal.fire('File Tidak Valid', 'Pastikan file adalah format JSON template yang benar.', 'error'); }
+            }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); event.target.value = ''; });
+        } catch (err) { if (typeof Swal !== 'undefined') Swal.fire('File Tidak Valid', 'Pastikan file adalah format JSON template yang benar.', 'error'); }
     };
     reader.readAsText(file);
 }
@@ -1305,7 +1305,7 @@ function filterSiswa(query) {
     const resultsDiv = document.getElementById('siswa_results_list');
     if (!resultsDiv) return;
     if (!query || query.length < 3) { resultsDiv.innerHTML = ""; resultsDiv.classList.add('hidden'); return; }
-    
+
     window.electronAPI.cariSiswa(query).then(data => {
         if (!data || data.length === 0) { resultsDiv.innerHTML = '<div class="p-3 text-[10px] text-slate-400 text-center italic">Siswa tidak ditemukan...</div>'; }
         else {
@@ -1318,32 +1318,32 @@ function filterSiswa(query) {
 function simpanDataSiswa() {
     const form = document.getElementById('form-siswa');
     const formData = new FormData(form); const data = {}; formData.forEach((value, key) => data[key] = value);
-    if (!data.Nama || !data.NISN) { if(typeof tampilkanToast==="function") tampilkanToast("error", "TIDAK LENGKAP", "Nama dan NISN wajib diisi!"); return; }
-    
+    if (!data.Nama || !data.NISN) { if (typeof tampilkanToast === "function") tampilkanToast("error", "TIDAK LENGKAP", "Nama dan NISN wajib diisi!"); return; }
+
     setLoading(true, "Menyimpan data siswa...");
     window.electronAPI.simpanSiswaBaru(data).then(res => {
         setLoading(false);
         if (res.status === "SUCCESS") {
-            if(typeof tampilkanToast==="function") tampilkanToast("success", "BERHASIL", res.message);
-            window.selectedSiswa = data; if(typeof tutupModalSiswa==="function") tutupModalSiswa();
-            if(typeof muatTabelSiswa==="function") muatTabelSiswa(); if(typeof updateLivePreview==="function") updateLivePreview();
-        } else { if(typeof tampilkanToast==="function") tampilkanToast("error", "GAGAL", res.message); }
-    }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); });
+            if (typeof tampilkanToast === "function") tampilkanToast("success", "BERHASIL", res.message);
+            window.selectedSiswa = data; if (typeof tutupModalSiswa === "function") tutupModalSiswa();
+            if (typeof muatTabelSiswa === "function") muatTabelSiswa(); if (typeof updateLivePreview === "function") updateLivePreview();
+        } else { if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", res.message); }
+    }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
 }
 
 function hapusDataSiswa(nisnManual, namaManual) {
     const nisn = nisnManual || document.querySelector('#form-siswa [name="NISN"]').value;
     const nama = namaManual || document.querySelector('#form-siswa [name="Nama"]').value;
     if (!nisn) return;
-    
-    if(typeof Swal === 'undefined') return;
+
+    if (typeof Swal === 'undefined') return;
     Swal.fire({ title: 'Hapus Siswa?', text: `Data ${nama} akan dihapus permanen.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'Ya, Hapus' }).then((result) => {
         if (result.isConfirmed) {
             setLoading(true, "Menghapus...");
             window.electronAPI.hapusSiswa(nisn).then(res => {
-                setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast(res.status === "SUCCESS" ? "success" : "error", "HAPUS", res.message);
-                if (res.status === "SUCCESS") { window.selectedSiswa = null; if (!nisnManual && typeof tutupModalSiswa==="function") tutupModalSiswa(); if(typeof muatTabelSiswa==="function") muatTabelSiswa(); if(typeof updateLivePreview==="function") updateLivePreview(); }
-            }).catch(err => { setLoading(false); if(typeof tampilkanToast==="function") tampilkanToast("error", "ERROR", err.toString()); });
+                setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast(res.status === "SUCCESS" ? "success" : "error", "HAPUS", res.message);
+                if (res.status === "SUCCESS") { window.selectedSiswa = null; if (!nisnManual && typeof tutupModalSiswa === "function") tutupModalSiswa(); if (typeof muatTabelSiswa === "function") muatTabelSiswa(); if (typeof updateLivePreview === "function") updateLivePreview(); }
+            }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
         }
     });
 }
@@ -1359,13 +1359,13 @@ function handleImporSiswaExcel(event) {
             const workbook = XLSX.read(dataRaw, { type: 'array' });
             const firstSheet = workbook.SheetNames[0];
             const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-            if (!jsonData || jsonData.length === 0) { if(typeof tampilkanToast==="function") tampilkanToast("error", "KOSONG", "Tidak ada data di file Excel."); return; }
-            
+            if (!jsonData || jsonData.length === 0) { if (typeof tampilkanToast === "function") tampilkanToast("error", "KOSONG", "Tidak ada data di file Excel."); return; }
+
             setLoading(true, "Mengimpor...");
             window.electronAPI.imporSiswaBatch(jsonData).then(res => {
-                setLoading(false); if(typeof Swal!=='undefined') Swal.fire('Impor Selesai', res.message, 'success'); event.target.value = ""; if(typeof muatTabelSiswa==="function") muatTabelSiswa();
-            }).catch(err => { setLoading(false); if(typeof Swal!=='undefined') Swal.fire('Gagal', err.toString(), 'error'); event.target.value = ""; });
-        } catch(err) { if(typeof Swal!=='undefined') Swal.fire('Error', err.toString(), 'error'); event.target.value = ""; }
+                setLoading(false); if (typeof Swal !== 'undefined') Swal.fire('Impor Selesai', res.message, 'success'); event.target.value = ""; if (typeof muatTabelSiswa === "function") muatTabelSiswa();
+            }).catch(err => { setLoading(false); if (typeof Swal !== 'undefined') Swal.fire('Gagal', err.toString(), 'error'); event.target.value = ""; });
+        } catch (err) { if (typeof Swal !== 'undefined') Swal.fire('Error', err.toString(), 'error'); event.target.value = ""; }
     };
     reader.readAsArrayBuffer(file);
 }
@@ -1528,7 +1528,7 @@ function bersihkanFormSuratSelesai() {
     setIsiEditorValue('');
     const inSid = document.getElementById('in_serial_id'); if (inSid) inSid.value = "";
     const inputTgl = document.getElementById('in_tanggal'); if (inputTgl) { const now = new Date(); inputTgl.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; }
-    shortUrlCache = ""; lastSidForShortening = ""; if(typeof updateLivePreview==="function") updateLivePreview();
+    shortUrlCache = ""; lastSidForShortening = ""; if (typeof updateLivePreview === "function") updateLivePreview();
 }
 
 function buatTemplateBaru() {
@@ -1707,12 +1707,12 @@ let chartSuratInstance = null;
 function renderDashboardCharts() {
     const ctx = document.getElementById('chartSurat');
     if (!ctx) return;
-    
+
     // Hitung statistik arsip per bulan
     const arsip = window.cacheArsip || [];
     const monthlyCounts = {};
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-    
+
     arsip.forEach(item => {
         if (!item.tanggal) return;
         try {
@@ -1721,7 +1721,7 @@ function renderDashboardCharts() {
                 const m = d.getMonth();
                 monthlyCounts[m] = (monthlyCounts[m] || 0) + 1;
             }
-        } catch(e) {}
+        } catch (e) { }
     });
 
     const dataPoints = months.map((m, i) => monthlyCounts[i] || 0);
@@ -1772,12 +1772,12 @@ function renderDashboardCharts() {
 function renderDaftarArsip(data) {
     const box = document.getElementById('kontainer-arsip');
     if (!box) return;
-    if (!data || data.length === 0) { 
+    if (!data || data.length === 0) {
         box.innerHTML = `<div class="flex flex-col items-center justify-center py-10 text-center opacity-70">
           <svg class="w-16 h-16 text-slate-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
           <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Belum Ada Arsip</span>
-        </div>`; 
-        return; 
+        </div>`;
+        return;
     }
     box.innerHTML = data.map(row => `
     <div class="bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-blue transition-all cursor-default group relative">
@@ -1863,7 +1863,7 @@ function cetakUlangArsip(encodedData) {
         if (inSid) { inSid.value = (row.sid && row.sid !== "N/A") ? row.sid : ""; shortUrlCache = ""; lastSidForShortening = ""; }
         const inputTgl = document.getElementById('in_tanggal');
         if (inputTgl && row.tanggal) { inputTgl.value = String(row.tanggal).includes('T') ? row.tanggal.split('T')[0] : row.tanggal; }
-        
+
         switchTab('isi');
         if (typeof updateLivePreview === "function") updateLivePreview();
 
@@ -2192,12 +2192,12 @@ function muatDataMasuk() {
 
 function renderListMasuk(data) {
     const kontainer = document.getElementById('kontainer-masuk'); kontainer.innerHTML = '';
-    if (!data || data.length === 0) { 
+    if (!data || data.length === 0) {
         kontainer.innerHTML = `<div class="flex flex-col items-center justify-center py-10 text-center opacity-70">
           <svg class="w-16 h-16 text-slate-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
           <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Belum Ada Surat Masuk</span>
-        </div>`; 
-        return; 
+        </div>`;
+        return;
     }
     data.forEach(item => {
         const linkFile = item.link && item.link !== '-' ? item.link : '#';
@@ -2269,31 +2269,31 @@ function validasiNomorManual() {
     if (parts.length < 4) {
         window.electronAPI.cekFullNomorDuplikat(nomor).then(isDuplikat => {
             el.classList.remove('opacity-50');
-            if (isDuplikat) { 
-                tampilkanToast("warning", "NOMOR TERSEDIA", "Nomor ini sudah ada, sedang menyesuaikan..."); 
-                el.classList.add('border-red-500', 'ring-2', 'ring-red-200'); 
-                mintaNomorOtomatis(); 
+            if (isDuplikat) {
+                tampilkanToast("warning", "NOMOR TERSEDIA", "Nomor ini sudah ada, sedang menyesuaikan...");
+                el.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+                mintaNomorOtomatis();
             }
         }).catch(err => {
             el.classList.remove('opacity-50');
             console.error("Duplicate Check Error:", err);
-        }); 
+        });
         return;
     }
     const urutan = parts[1]; const tahun = parts[parts.length - 1];
     window.electronAPI.cekNomorDuplikat(urutan, tahun).then(status => {
         el.classList.remove('opacity-50');
-        if (status === "DUPLICATE") { 
-            tampilkanToast("warning", "NOMOR DISESUAIKAN", `Nomor urut ${urutan} sudah digunakan. Menyesuaikan...`); 
-            el.classList.add('border-red-500', 'ring-2', 'ring-red-200'); 
-            mintaNomorOtomatis(); 
-        } else if (status === "JUMP") { 
-            tampilkanToast("warning", "URUTAN DIPERBAIKI", `Nomor urut ${urutan} melompat. Mengembalikan ke urutan benar.`); 
-            el.classList.add('border-red-500', 'ring-2', 'ring-red-200'); 
-            mintaNomorOtomatis(); 
-        } else if (status === "VALID") { 
-            el.classList.remove('border-red-500', 'ring-2', 'ring-red-200'); 
-            tampilkanToast("success", "NOMOR TERSEDIA", "Nomor ini unik dan dapat digunakan."); 
+        if (status === "DUPLICATE") {
+            tampilkanToast("warning", "NOMOR DISESUAIKAN", `Nomor urut ${urutan} sudah digunakan. Menyesuaikan...`);
+            el.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+            mintaNomorOtomatis();
+        } else if (status === "JUMP") {
+            tampilkanToast("warning", "URUTAN DIPERBAIKI", `Nomor urut ${urutan} melompat. Mengembalikan ke urutan benar.`);
+            el.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+            mintaNomorOtomatis();
+        } else if (status === "VALID") {
+            el.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+            tampilkanToast("success", "NOMOR TERSEDIA", "Nomor ini unik dan dapat digunakan.");
         }
     }).catch(err => {
         el.classList.remove('opacity-50');
@@ -2431,10 +2431,10 @@ function setupDashboardUI() {
         if (document.getElementById('about-app-for')) document.getElementById('about-app-for').innerText = globalAppName;
         if (document.getElementById('about-app-engine-name')) document.getElementById('about-app-engine-name').innerText = globalAppName + " Engine";
     }
-    if (globalLogo) { 
+    if (globalLogo) {
         const logoWithBuster = getLogoWithCacheBuster(globalLogo);
-        if (document.getElementById('app-logo-login')) document.getElementById('app-logo-login').src = logoWithBuster; 
-        if (document.getElementById('brand-logo-nav')) document.getElementById('brand-logo-nav').src = logoWithBuster; 
+        if (document.getElementById('app-logo-login')) document.getElementById('app-logo-login').src = logoWithBuster;
+        if (document.getElementById('brand-logo-nav')) document.getElementById('brand-logo-nav').src = logoWithBuster;
     }
 }
 
@@ -2457,7 +2457,7 @@ function runVerificationMode(uid) {
     const vPage = document.getElementById('verification-page'); const vCard = document.getElementById('v-card');
     vPage.classList.remove('hidden'); setTimeout(() => { vPage.classList.replace('opacity-0', 'opacity-100'); vCard.classList.replace('scale-95', 'scale-100'); }, 100);
     document.getElementById('v-sid').innerText = uid || 'N/A';
-    
+
     setLoading(true, "Verifikasi Dokumen...");
     window.electronAPI.verifikasiSuratByUid(uid).then(res => {
         if (res.status === "SUCCESS") {
@@ -2489,12 +2489,12 @@ function initializeApp() {
     const urlParamsObj = new URLSearchParams(window.location.search);
     const mode = urlParamsObj.get('mode') || (typeof globalParams !== 'undefined' ? globalParams.mode : null);
     const id = urlParamsObj.get('id') || (typeof globalParams !== 'undefined' ? globalParams.id : null);
-    
-    if (mode === '1' && id) { 
-        runVerificationMode(id); 
-        return; 
+
+    if (mode === '1' && id) {
+        runVerificationMode(id);
+        return;
     }
-    
+
     setupDashboardUI(); initTinyMCEEditor();
     if (typeof muatAwalSeluruhKonfigurasi === "function") muatAwalSeluruhKonfigurasi(true);
     if (typeof periksaSesiLoginOtomatis === "function") periksaSesiLoginOtomatis();
@@ -2544,7 +2544,7 @@ function runVerificationMode(uid) {
     document.getElementById('login-page').classList.add('hidden');
     const vPage = document.getElementById('verification-page'); const vCard = document.getElementById('v-card');
     vPage.classList.remove('hidden'); setTimeout(() => { vPage.classList.replace('opacity-0', 'opacity-100'); vCard.classList.replace('scale-95', 'scale-100'); }, 100);
-    
+
     document.getElementById('v-sid').innerText = uid || 'N/A';
     document.getElementById('v-no').innerText = "Memverifikasi...";
     document.getElementById('v-hal').innerText = "Mengambil data pangkalan...";
@@ -2560,7 +2560,7 @@ function runVerificationMode(uid) {
         if (document.getElementById('v-logo')) document.getElementById('v-logo').src = logoWithBuster;
         if (document.getElementById('v-watermark')) document.getElementById('v-watermark').src = logoWithBuster;
     }
-    
+
     setLoading(true, "Verifikasi Dokumen...");
     window.electronAPI.verifikasiSuratByUid(uid).then(res => {
         if (res.status === "SUCCESS") {
@@ -2638,7 +2638,7 @@ function navigasiHalaman(arah) {
     pages.forEach((p, index) => {
         const rect = p.getBoundingClientRect();
         // Cek jarak offset dari top viewport untuk menentukan halaman yang aktif
-        const distance = Math.abs(rect.top - 80); 
+        const distance = Math.abs(rect.top - 80);
         if (distance < minDistance) {
             minDistance = distance;
             currentPageIdx = index;
@@ -2671,9 +2671,9 @@ function perbaruiPenghitungHalaman() {
     const pages = document.querySelectorAll('.page-sheet');
     const elTotal = document.getElementById('total-page-val');
     const elCurrent = document.getElementById('current-page-val');
-    
+
     if (!elTotal || !elCurrent || pages.length === 0) return;
-    
+
     elTotal.innerText = pages.length;
 
     let currentPageIdx = 0;
@@ -2707,21 +2707,21 @@ document.addEventListener("DOMContentLoaded", () => {
 // =============================================================
 async function siapkanDanCetak() {
     setLoading(true, "Menyiapkan Print Preview...");
-    
+
     // Tampilkan modal print preview
     const modal = document.getElementById('modal-print-preview');
     if (modal) modal.classList.remove('hidden');
-    
+
     const loadingLayer = document.getElementById('pp_loading');
     if (loadingLayer) loadingLayer.classList.remove('hidden');
-    
+
     try {
         // Ambil daftar printer
         const printers = await window.electronAPI.ambilPrinters();
         const selectPrinter = document.getElementById('pp_printer_list');
         if (selectPrinter) {
             selectPrinter.innerHTML = '';
-            
+
             printers.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.name;
@@ -2736,7 +2736,7 @@ async function siapkanDanCetak() {
 
         // Hasilkan PDF Pratinjau via IPC (main.js)
         const pdfResult = await window.electronAPI.generatePdfPreview();
-        
+
         if (pdfResult && pdfResult.status === 'SUCCESS') {
             const byteCharacters = atob(pdfResult.buffer);
             const byteNumbers = new Array(byteCharacters.length);
@@ -2746,13 +2746,13 @@ async function siapkanDanCetak() {
             const byteArray = new Uint8Array(byteNumbers);
             const blob = new Blob([byteArray], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
-            
+
             const frame = document.getElementById('pp_frame');
             if (frame) frame.src = url;
         } else {
             throw new Error(pdfResult ? pdfResult.message : "Gagal generate PDF");
         }
-        
+
         if (loadingLayer) loadingLayer.classList.add('hidden');
         setLoading(false);
     } catch (err) {
@@ -2769,7 +2769,7 @@ async function siapkanDanCetak() {
 function tutupModalPrintPreview() {
     const modal = document.getElementById('modal-print-preview');
     if (modal) modal.classList.add('hidden');
-    
+
     const frame = document.getElementById('pp_frame');
     if (frame && frame.src) {
         URL.revokeObjectURL(frame.src);
@@ -2780,20 +2780,20 @@ function tutupModalPrintPreview() {
 async function eksekusiPrintSiluman() {
     const printerName = document.getElementById('pp_printer_list').value;
     const copies = parseInt(document.getElementById('pp_copies').value, 10) || 1;
-    
+
     if (!printerName) {
         if (typeof tampilkanToast === "function") tampilkanToast('warning', 'PILIH PRINTER', 'Silakan pilih printer tujuan terlebih dahulu.');
         return;
     }
-    
+
     const btn = document.getElementById('btn_execute_print');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Mencetak...';
     btn.disabled = true;
-    
+
     try {
         const result = await window.electronAPI.printDokumenKustom(printerName, copies);
-        
+
         if (result && result.status === 'SUCCESS') {
             if (typeof tampilkanToast === "function") tampilkanToast('success', 'CETAK BERHASIL', 'Dokumen berhasil dikirim ke printer.');
             tutupModalPrintPreview();
@@ -2813,7 +2813,7 @@ async function eksekusiPrintSiluman() {
 // =============================================================
 if (window.electronAPI && window.electronAPI.onUpdateAvailable) {
     window.electronAPI.onUpdateAvailable(() => {
-        if(typeof tampilkanToast === 'function') {
+        if (typeof tampilkanToast === 'function') {
             tampilkanToast('info', 'Pembaruan Ditemukan', 'Mengunduh versi terbaru di latar belakang...');
         }
     });
@@ -2836,4 +2836,12 @@ if (window.electronAPI && window.electronAPI.onUpdateAvailable) {
             });
         }
     });
-}
+}
+
+if (window.electronAPI && window.electronAPI.onDatabaseSynced) {
+    window.electronAPI.onDatabaseSynced(() => {
+        if (typeof muatAwalSeluruhKonfigurasi === "function") {
+            muatAwalSeluruhKonfigurasi(true);
+        }
+    });
+}
