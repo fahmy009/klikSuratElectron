@@ -1,0 +1,47 @@
+{
+  "name": "kliksurat-desktop",
+  "version": "4.0.0",
+  "description": "Aplikasi Surat Digital SDN Mojogemi 02 by Muhammad Fahmy",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "author": "Muhammad Fahmy",
+  "license": "ISC",
+  "dependencies": {
+    "electron-updater": "^6.3.9",
+    "sql.js": "^1.14.1"
+  },
+  "devDependencies": {
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.kliksurat.desktop",
+    "productName": "KlikSurat",
+    "compression": "maximum",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "fahmy009",
+        "repo": "klikSuratElectron"
+      }
+    ],
+    "win": {
+      "icon": "assets/jember-ico.ico"
+    },
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "style.css",
+      "index.html",
+      "assets/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ]
+  }
+}
