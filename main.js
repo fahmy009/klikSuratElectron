@@ -1,9 +1,21 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const initSqlJs = require('sql.js');
 const zlib = require('zlib');
-const { autoUpdater } = require("electron-updater");
+
+let initSqlJs;
+let autoUpdater;
+
+try {
+    initSqlJs = require('sql.js');
+    autoUpdater = require("electron-updater").autoUpdater;
+} catch (error) {
+    dialog.showErrorBox(
+        "Gagal Memuat Aplikasi",
+        "Komponen penting aplikasi tidak ditemukan.\nDetail: " + error.message + "\n\nSolusi: Harap buka Terminal di folder aplikasi ini dan jalankan perintah 'npm install', lalu coba buka kembali."
+    );
+    app.exit(1);
+}
 
 let GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx_6UUpq0tDWJZoGwGSWA3FubRs4hkXdh34lzIdt4gEzIiNJh8tA-5wRg_6h7x5INv4/exec';
 
