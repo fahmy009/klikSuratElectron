@@ -6,6 +6,7 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder --win --x64",
+    "release": "electron-builder --win --x64 --publish always",
     "postinstall": "electron-builder install-app-deps"
   },
   "author": "Muhammad Fahmy",
