@@ -355,9 +355,9 @@ async function syncDatabaseFromCloud() {
                 const stmt = db.prepare(`INSERT INTO arsip (id, nomor, tanggal, perihal, penerima, lampiran, pembuka, isi, tembusan, operator, sid, ref_id, layout) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
                 const tx = db.transaction((list) => {
+                    let currentId = Date.now();
                     for (const row of list) {
-                        const parsedId = Number(row.id) || Date.now();
-                        stmt.run(parsedId, row.nomor || '', row.tanggal || '', row.perihal || '', row.penerima || '', row.lampiran || '', row.pembuka || '', row.isi || '', row.tembusan || '', row.operator || '', row.sid || '', row.ref_id || '', row.layout || 'standard');
+                        stmt.run(currentId--, row.nomor || '', row.tanggal || '', row.perihal || '', row.penerima || '', row.lampiran || '', row.pembuka || '', row.isi || '', row.tembusan || '', row.operator || '', row.sid || '', row.ref_id || '', row.layout || 'standard');
                     }
                 });
                 tx(result.data);
@@ -379,9 +379,9 @@ async function syncDatabaseFromCloud() {
                 db.exec('DELETE FROM masuk');
                 const stmt = db.prepare('INSERT INTO masuk (id, asal, nomor, perihal, tanggal, operator, extracted, link) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
                 const tx = db.transaction((list) => {
+                    let currentId = Date.now();
                     for (const row of list) {
-                        const parsedId = Number(row.id) || Date.now();
-                        stmt.run(parsedId, row.asal || '', row.nomor || '', row.perihal || '', row.tanggal || '', row.operator || '', row.ocr || '', row.link || '');
+                        stmt.run(currentId--, row.asal || '', row.nomor || '', row.perihal || '', row.tanggal || '', row.operator || '', row.ocr || '', row.link || '');
                     }
                 });
                 tx(result.data);
@@ -463,6 +463,16 @@ async function syncDatabaseFromCloud() {
         sendSyncStatus('error', 'Terjadi kesalahan saat sinkronisasi.');
     }
 }
+
+ipcMain.handle('sinkronisasi-otomatis', async () => {
+    // Dipanggil dari frontend saat koneksi internet kembali aktif
+    try {
+        await syncDatabaseFromCloud();
+        return { status: 'SUCCESS' };
+    } catch (e) {
+        return { status: 'ERROR', message: e.message };
+    }
+});
 
 async function checkAndRunAutoBackup(dbPath) {
     try {
@@ -1052,7 +1062,11 @@ ipcMain.handle('simpan-surat-masuk-ocr', async (event, meta, b64, mime) => {
 
 // 5. Template Surat
 ipcMain.handle('ambil-semua-template', () => {
-    return db.prepare('SELECT data FROM templates').all().map(r => JSON.parse(r.data));
+    return db.prepare('SELECT nama, data FROM templates').all().map(r => {
+        let obj = JSON.parse(r.data);
+        obj.nama = r.nama;
+        return obj;
+    });
 });
 
 ipcMain.handle('simpan-template-dinamis', async (event, payload) => {
@@ -1503,6 +1517,32 @@ ipcMain.handle('generate-pdf-preview', async () => {
                 pageSize: 'A4' // atau sesuaikan dengan config kertas
             });
             return { status: 'SUCCESS', buffer: pdfBuffer.toString('base64') };
+        } catch (e) {
+            return { status: 'ERROR', message: e.message };
+        }
+    }
+    return { status: 'ERROR', message: 'Window not found' };
+});
+
+ipcMain.handle('simpan-sebagai-pdf', async (event, defaultName) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        try {
+            const pdfBuffer = await mainWindow.webContents.printToPDF({
+                marginsType: 0,
+                printBackground: true,
+                pageSize: 'A4'
+            });
+            const { filePath } = await dialog.showSaveDialog(mainWindow, {
+                title: 'Simpan PDF Surat',
+                defaultPath: defaultName || 'Surat.pdf',
+                filters: [{ name: 'PDF Documents', extensions: ['pdf'] }]
+            });
+            if (filePath) {
+                fs.writeFileSync(filePath, pdfBuffer);
+                return { status: 'SUCCESS', path: filePath };
+            } else {
+                return { status: 'CANCELED' };
+            }
         } catch (e) {
             return { status: 'ERROR', message: e.message };
         }

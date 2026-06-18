@@ -42,6 +42,7 @@
     <div style="display: none !important;">
         <input type="hidden" id="in_logo_kiri">
         <input type="hidden" id="in_logo_kanan">
+        <input type="hidden" id="in_ttd_ks">
         <input type="hidden" id="in_serial_id">
     </div>
 
@@ -210,7 +211,7 @@
                     class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-emerald-600 text-slate-400 hover:text-white transition-all shadow-lg"
                     title="Tentang Aplikasi"><i class="fa fa-info-circle"></i></button>
                 <button id="btn-open-settings" onclick="bukaModalSettings()"
-                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-brand-blue text-slate-400 hover:text-white transition-all shadow-lg hidden"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-brand-blue text-slate-400 hover:text-white transition-all shadow-lg"
                     title="Pengaturan Aplikasi"><i class="fa fa-cog"></i></button>
                 <button onclick="handleLogout()"
                     class="text-xs bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-3 py-1.5 rounded-xl transition-all font-semibold">Keluar</button>
@@ -553,56 +554,7 @@
                                             value="20" oninput="sinkronisasiLayoutKonfigurasi()"></div>
                                 </div>
                             </div>
-                            <div
-                                class="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
-                                <h4
-                                    class="text-xs font-bold text-brand-navy dark:text-brand-blue uppercase tracking-wider border-b pb-1 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-cogs text-brand-blue"></i> Pengaturan Aplikasi & Nomor
-                                </h4>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Nama
-                                        Aplikasi</label>
-                                    <input type="text" id="in_app_name" value="KlikSurat"
-                                        class="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-sm font-bold">
-                                </div>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Kode
-                                            Provinsi</label>
-                                        <input type="text" id="in_kode_provinsi"
-                                            class="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs"
-                                            oninput="updateLivePreview()">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Kode
-                                            Kabupaten</label>
-                                        <input type="text" id="in_kode_kabupaten"
-                                            class="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs"
-                                            oninput="updateLivePreview()">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Kode
-                                            Dinas</label>
-                                        <input type="text" id="in_kode_dinas"
-                                            class="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs"
-                                            oninput="updateLivePreview()">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-400 mb-1 uppercase">Kode
-                                            Kecamatan</label>
-                                        <input type="text" id="in_kode_kecamatan"
-                                            class="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs"
-                                            oninput="updateLivePreview()">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">NPSN
-                                        Sekolah (8 Digit)</label>
-                                    <input type="text" id="in_npsn_sekolah"
-                                        class="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono"
-                                        oninput="updateLivePreview()">
-                                </div>
-                            </div>
+
                             <div
                                 class="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
                                 <h4
@@ -666,6 +618,12 @@
                                             class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-blue"
                                             oninput="document.getElementById('val_ttd_height').innerText = this.value; updateLivePreview()">
                                     </div>
+                                    <div class="flex-1"><span class="text-[9px] block text-slate-500 mb-1">Geser Kiri/Kanan: <span
+                                                id="val_geser_ttd_x">0</span>px</span><input type="range"
+                                            id="in_geser_ttd_x" min="-150" max="150" step="5" value="0"
+                                            class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-blue"
+                                            oninput="document.getElementById('val_geser_ttd_x').innerText = this.value; updateLivePreview()">
+                                    </div>
                                     <div class="flex flex-col items-center border-l pl-3"><span
                                             class="text-[9px] text-slate-500 mb-1 uppercase">Materai</span><label
                                             class="relative inline-flex items-center cursor-pointer"><input
@@ -675,8 +633,17 @@
                                                 class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-blue">
                                             </div>
                                         </label></div>
+                                    <div class="flex flex-col items-center border-l pl-3"><span
+                                            class="text-[9px] text-slate-500 mb-1 uppercase text-center leading-tight">TTD KS<br>Otomatis</span><label
+                                            class="relative inline-flex items-center cursor-pointer mt-1"><input
+                                                type="checkbox" id="in_tampil_ttd_ks" class="sr-only peer"
+                                                onchange="updateLivePreview()">
+                                            <div
+                                                class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-600">
+                                            </div>
+                                        </label></div>
                                     <div
-                                        class="flex flex-col items-center border-l border-slate-200 dark:border-slate-700 pl-3 col-span-2 mt-2 pt-2">
+                                        class="flex flex-col items-center border-l border-slate-200 dark:border-slate-700 pl-3 col-span-4 mt-2 pt-2">
                                         <span class="text-[9px] text-slate-500 mb-1 uppercase">Gunakan Bingkai Foto
                                             3x4</span><label
                                             class="relative inline-flex items-center cursor-pointer"><input
@@ -814,10 +781,16 @@
                             <button onclick="prosesSimpanData()"
                                 class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md text-sm transition-all flex items-center justify-center gap-2"><i
                                     class="fa-solid fa-floppy-disk"></i> Simpan Data</button>
-                            <button id="btn-cetak-surat" onclick="siapkanDanCetak()"
-                                class="py-2.5 bg-brand-blue hover:bg-brand-blue/90 text-white font-bold rounded-xl shadow-md text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled aria-disabled="true" title="Arsipkan surat terlebih dahulu untuk mencetak"><i
-                                    class="fa fa-print"></i> Cetak Surat</button>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="btn-cetak-surat" onclick="siapkanDanCetak()"
+                                    class="py-2.5 bg-brand-blue hover:bg-brand-blue/90 text-white font-bold rounded-xl shadow-md text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled aria-disabled="true" title="Arsipkan surat terlebih dahulu untuk mencetak"><i
+                                        class="fa fa-print"></i> Cetak</button>
+                                <button id="btn-cetak-pdf" onclick="siapkanDanPdf()"
+                                    class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled aria-disabled="true" title="Arsipkan surat terlebih dahulu untuk menyimpan PDF"><i
+                                        class="fa fa-file-pdf"></i> PDF</button>
+                            </div>
                         </div>
                     </div>
                 </aside>
@@ -1056,6 +1029,11 @@
                                     <button type="button" onclick="document.getElementById('file_logo_kanan').click()"
                                         class="w-full py-2 bg-white dark:bg-slate-700 text-[10px] font-bold rounded-lg border shadow-sm">UPLOAD
                                         LOGO KANAN</button>
+                                    <input type="file" id="file_ttd_ks" accept="image/*" class="hidden"
+                                        onchange="prosesUnggahLogoKeDrive('ttd_ks')">
+                                    <button type="button" onclick="document.getElementById('file_ttd_ks').click()"
+                                        class="w-full py-2 bg-slate-800 text-white dark:bg-slate-700 text-[10px] font-bold rounded-lg shadow-sm border border-brand-blue mt-2">UPLOAD
+                                        TTD KEPALA SEKOLAH</button>
                                 </div>
                             </div>
                         </div>

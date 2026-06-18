@@ -81,6 +81,7 @@ function syncArchiveStatusUI() {
     const statusBadge = document.getElementById('print-status-badge');
     const statusText = document.getElementById('print-status-text');
     const printButton = document.getElementById('btn-cetak-surat');
+    const pdfButton = document.getElementById('btn-cetak-pdf');
 
     if (!statusWrap || !statusIcon || !statusBadge || !statusText || !printButton) {
         return;
@@ -95,11 +96,20 @@ function syncArchiveStatusUI() {
         statusBadge.className = 'inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-100';
         statusBadge.textContent = 'ARSIP TERSIMPAN';
         statusText.textContent = 'Surat sudah tercatat dan siap diverifikasi melalui scan.';
+        
         printButton.disabled = false;
         printButton.classList.remove('opacity-50', 'cursor-not-allowed');
         printButton.classList.add('shadow-md');
         printButton.title = 'Cetak surat sekarang';
         printButton.setAttribute('aria-disabled', 'false');
+        
+        if (pdfButton) {
+            pdfButton.disabled = false;
+            pdfButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            pdfButton.classList.add('shadow-md');
+            pdfButton.title = 'Simpan sebagai PDF sekarang';
+            pdfButton.setAttribute('aria-disabled', 'false');
+        }
     } else {
         statusWrap.className = 'mb-3 rounded-2xl border border-amber-200 bg-amber-50/90 p-3 shadow-sm dark:border-amber-500/30 dark:bg-amber-500/10';
         statusIcon.className = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-100';
@@ -107,11 +117,20 @@ function syncArchiveStatusUI() {
         statusBadge.className = 'inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700 dark:bg-amber-500/20 dark:text-amber-100';
         statusBadge.textContent = 'ARSIP BELUM SIAP';
         statusText.textContent = 'Simpan data terlebih dahulu agar surat dapat diverifikasi setelah dicetak.';
+        
         printButton.disabled = true;
         printButton.classList.add('opacity-50', 'cursor-not-allowed');
         printButton.classList.remove('shadow-md');
         printButton.title = 'Arsipkan surat terlebih dahulu untuk mencetak';
         printButton.setAttribute('aria-disabled', 'true');
+        
+        if (pdfButton) {
+            pdfButton.disabled = true;
+            pdfButton.classList.add('opacity-50', 'cursor-not-allowed');
+            pdfButton.classList.remove('shadow-md');
+            pdfButton.title = 'Arsipkan surat terlebih dahulu untuk menyimpan PDF';
+            pdfButton.setAttribute('aria-disabled', 'true');
+        }
     }
 }
 
@@ -270,12 +289,7 @@ function muatAwalSeluruhKonfigurasi(silent = false) {
             console.log("Data yang diterima Frontend:", config);
             console.log("=============================================");
 
-            if (document.getElementById('in_app_name')) document.getElementById('in_app_name').value = config.App_Name || "KlikSurat";
-            if (document.getElementById('in_npsn_sekolah')) document.getElementById('in_npsn_sekolah').value = config.NPSN_Sekolah || "";
-            if (document.getElementById('in_kode_provinsi')) document.getElementById('in_kode_provinsi').value = config.Kode_Provinsi || "35";
-            if (document.getElementById('in_kode_kabupaten')) document.getElementById('in_kode_kabupaten').value = config.Kode_Kabupaten || "09";
-            if (document.getElementById('in_kode_dinas')) document.getElementById('in_kode_dinas').value = config.Kode_Dinas || "310";
-            if (document.getElementById('in_kode_kecamatan')) document.getElementById('in_kode_kecamatan').value = config.Kode_Kecamatan || "24";
+
 
             if (document.getElementById('set_app_name')) document.getElementById('set_app_name').value = config.App_Name || "KlikSurat";
             if (document.getElementById('set_npsn_sekolah')) document.getElementById('set_npsn_sekolah').value = config.NPSN_Sekolah || "";
@@ -294,6 +308,13 @@ function muatAwalSeluruhKonfigurasi(silent = false) {
             if (document.getElementById('in_logo_kiri')) document.getElementById('in_logo_kiri').value = config.Logo_Kiri_Url || "";
             if (document.getElementById('in_ttd_foto')) document.getElementById('in_ttd_foto').checked = (config.Ttd_Gunakan_Foto === "YA");
             if (document.getElementById('in_logo_kanan')) document.getElementById('in_logo_kanan').value = config.Logo_Kanan_Url || "";
+            if (document.getElementById('in_ttd_ks')) document.getElementById('in_ttd_ks').value = config.Ttd_Ks_Url || "";
+            if (document.getElementById('in_tampil_ttd_ks')) document.getElementById('in_tampil_ttd_ks').checked = (config.Ttd_Gunakan_Ttd_Ks === "YA");
+            if (document.getElementById('in_geser_ttd_x')) {
+                const shiftX = config.Ttd_Geser_X_Ks || "0";
+                document.getElementById('in_geser_ttd_x').value = shiftX;
+                if (document.getElementById('val_geser_ttd_x')) document.getElementById('val_geser_ttd_x').innerText = shiftX;
+            }
             const currentLogo = config.Logo_Kanan_Url || config.Logo_Kiri_Url || globalLogo || "";
             const appName = config.App_Name || globalAppName || "KlikSurat";
             if (typeof refreshUIIdentity === "function") {
@@ -422,6 +443,37 @@ function siapkanDanCetak() {
     setTimeout(() => {
         setLoading(false);
         cetakPreviewTerisolasi();
+    }, 450);
+}
+
+function siapkanDanPdf() {
+    if (typeof menjalankanUpdatePreviewLangsung === "function") menjalankanUpdatePreviewLangsung();
+    setLoading(true, "Mengekspor ke PDF...");
+    
+    // Hapus clone QR Code (jika ada duplicate dari pembuatan lib)
+    document.querySelectorAll('#print-area #qrcode').forEach((qrBox) => {
+        const qrImages = Array.from(qrBox.querySelectorAll('canvas, img'));
+        qrImages.slice(1).forEach(el => el.remove());
+    });
+
+    setTimeout(() => {
+        const namaSurat = document.getElementById('val_klasifikasi_nama')?.innerText || "Surat_Dinas";
+        const nomorSurat = document.getElementById('preview_nomor_surat')?.innerText.replace(/[\/\\]/g, '_') || Date.now();
+        const defaultName = `${namaSurat}_${nomorSurat}.pdf`;
+        
+        window.electronAPI.simpanSebagaiPdf(defaultName).then(res => {
+            setLoading(false);
+            if (res && res.status === 'SUCCESS') {
+                if (typeof tampilkanToast === "function") tampilkanToast("success", "BERHASIL", `PDF berhasil disimpan`);
+            } else if (res && res.status === 'CANCELED') {
+                // User membatalkan dialog
+            } else {
+                if (typeof tampilkanToast === "function") tampilkanToast("error", "GAGAL", "Gagal menyimpan PDF: " + (res ? res.message : ''));
+            }
+        }).catch(err => {
+            setLoading(false);
+            if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString());
+        });
     }, 450);
 }
 
@@ -652,7 +704,7 @@ function resolveVariables(text) {
     // Variabel Sekolah
     const getKopLive = (id, fallback) => { const val = document.getElementById(id)?.value; return (val && val.trim() !== "") ? val : fallback; };
     result = result.replace(/{{nama_sekolah}}/g, getKopLive('in_kop_sekolah', "SD Negeri ..."));
-    result = result.replace(/{{npsn_sekolah}}/g, getKopLive('in_npsn_sekolah', "........"));
+    result = result.replace(/{{npsn_sekolah}}/g, getKopLive('set_npsn_sekolah', "........"));
     result = result.replace(/{{alamat_sekolah}}/g, getKopLive('in_kop_alamat', "........"));
     result = result.replace(/{{kontak_sekolah}}/g, getKopLive('in_kop_kontak', "........"));
     result = result.replace(/{{daerah_sekolah}}/g, toProperCase(getKopLive('in_kop_daerah', "........")));
@@ -969,6 +1021,11 @@ function renderKomponenSpesimenTtd(targetEl) {
     });
     const p1 = getP(1), p2 = getP(2), p3 = getP(3);
 
+    const pakaiTtdKs = document.getElementById('in_tampil_ttd_ks')?.checked || false;
+    const urlTtdKs = document.getElementById('in_ttd_ks')?.value || "";
+    const geserTtdKs = document.getElementById('in_geser_ttd_x')?.value || "0";
+    const ttdKsHtml = (pakaiTtdKs && urlTtdKs) ? `<img src="${getLogoWithCacheBuster(urlTtdKs)}" class="absolute z-20" style="max-height: ${parseInt(ttdHeight) + 40}px; top: 50%; left: 50%; transform: translate(calc(-50% + ${geserTtdKs}px), -50%); object-fit: contain; pointer-events: none;">` : "";
+
     const materaiHtml = pakaiMaterai ? `<div class="absolute left-0 top-1/2 -translate-y-1/2 -rotate-12 border-2 border-dashed border-slate-300 p-2 text-[7pt] text-slate-400 font-bold leading-none select-none text-center z-10 bg-white/50">TEMPEL<br>MATERAI<br>10.000</div>` : "";
     const fotoHtml = pakaiFoto ? `<div class="shrink-0 border border-black flex items-center justify-center text-[7pt] text-slate-400 font-bold mb-6" style="width: 30mm; height: 40mm; margin-right: 15px;">PAS FOTO 3X4</div>` : "";
     const alignClass = isCentered ? 'text-left' : 'text-center';
@@ -987,11 +1044,11 @@ function renderKomponenSpesimenTtd(targetEl) {
     }
 
     if (modeTtdAktif === "kanan-bawah") {
-        c.innerHTML = `<div class="flex justify-end w-full"><div class="flex items-end">${fotoHtml}<div class="w-[300px] ${alignClass}">${prefixDitetapkan}<div class="whitespace-pre-line ${isCentered ? 'mt-2' : ''}">${p1.j}</div><div class="relative inline-block w-full">${materaiHtml}<div style="height: ${ttdHeight}px"></div></div><div class="font-bold underline">${p1.n}</div><div>${p1.p}</div><div>${p1.nip}</div></div></div></div>`;
+        c.innerHTML = `<div class="flex justify-end w-full"><div class="flex items-end">${fotoHtml}<div class="w-[300px] ${alignClass}">${prefixDitetapkan}<div class="whitespace-pre-line ${isCentered ? 'mt-2' : ''}">${p1.j}</div><div class="relative inline-block w-full">${materaiHtml}${ttdKsHtml}<div style="height: ${ttdHeight}px"></div></div><div class="font-bold underline">${p1.n}</div><div>${p1.p}</div><div>${p1.nip}</div></div></div></div>`;
     } else if (modeTtdAktif === "kanan-kiri") {
-        c.innerHTML = `<div class="flex justify-between w-full items-end"><div class="w-[280px] text-center pl-24">${p2.f ? `<div class="font-medium mb-1">${p2.f}</div>` : ''}<div class="whitespace-pre-line">${p2.j}</div><div class="h-20"></div><div class="font-bold underline">${p2.n}</div><div>${p2.p}</div><div>${p2.nip}</div></div><div class="w-[280px] ${alignClass}">${prefixDitetapkan}<div class="whitespace-pre-line">${p1.j}</div><div class="h-20"></div><div class="font-bold underline">${p1.n}</div><div>${p1.p}</div><div>${p1.nip}</div></div></div>`;
+        c.innerHTML = `<div class="flex justify-between w-full items-end"><div class="w-[280px] text-center pl-24">${p2.f ? `<div class="font-medium mb-1">${p2.f}</div>` : ''}<div class="whitespace-pre-line">${p2.j}</div><div class="h-20"></div><div class="font-bold underline">${p2.n}</div><div>${p2.p}</div><div>${p2.nip}</div></div><div class="w-[280px] ${alignClass}">${prefixDitetapkan}<div class="whitespace-pre-line">${p1.j}</div><div class="relative inline-block w-full">${materaiHtml}${ttdKsHtml}<div style="height: ${ttdHeight}px"></div></div><div class="font-bold underline">${p1.n}</div><div>${p1.p}</div><div>${p1.nip}</div></div></div>`;
     } else if (modeTtdAktif === "segitiga") {
-        c.innerHTML = `<div class="w-full flex flex-col items-center gap-8"><div class="w-full flex justify-between items-end"><div class="w-[260px] text-center">${p2.f ? `<div class="font-medium mb-1">${p2.f}</div>` : ''}<div class="whitespace-pre-line">${p2.j}</div><div class="h-20"></div><div class="font-bold underline">${p2.n}</div><div>${p2.p}</div><div>${p2.nip}</div></div><div class="w-[260px] ${alignClass}">${prefixDitetapkan}<div class="whitespace-pre-line">${p1.j}</div><div class="h-20"></div><div class="font-bold underline">${p1.n}</div><div>${p1.p}</div><div>${p1.nip}</div></div></div><div class="w-[300px] text-center mt-2">${p3.f ? `<div class="font-medium mb-1">${p3.f}</div>` : '<div class="font-medium mb-1">Mengetahui,</div>'}<div class="whitespace-pre-line">${p3.j}</div><div class="h-16"></div><div class="font-bold underline">${p3.n}</div><div>${p3.p}</div><div>${p3.nip}</div></div></div>`;
+        c.innerHTML = `<div class="w-full flex flex-col items-center gap-8"><div class="w-full flex justify-between items-end"><div class="w-[260px] text-center">${p2.f ? `<div class="font-medium mb-1">${p2.f}</div>` : ''}<div class="whitespace-pre-line">${p2.j}</div><div class="h-20"></div><div class="font-bold underline">${p2.n}</div><div>${p2.p}</div><div>${p2.nip}</div></div><div class="w-[260px] ${alignClass}">${prefixDitetapkan}<div class="whitespace-pre-line">${p1.j}</div><div class="relative inline-block w-full">${materaiHtml}${ttdKsHtml}<div style="height: ${ttdHeight}px"></div></div><div class="font-bold underline">${p1.n}</div><div>${p1.p}</div><div>${p1.nip}</div></div></div><div class="w-[300px] text-center mt-2">${p3.f ? `<div class="font-medium mb-1">${p3.f}</div>` : '<div class="font-medium mb-1">Mengetahui,</div>'}<div class="whitespace-pre-line">${p3.j}</div><div class="h-16"></div><div class="font-bold underline">${p3.n}</div><div>${p3.p}</div><div>${p3.nip}</div></div></div>`;
     }
 }
 
@@ -1010,7 +1067,10 @@ let cropperInstance = null;
 let currentCropPosition = '';
 
 function prosesUnggahLogoKeDrive(posisi) {
-    const fileInput = document.getElementById(posisi === 'left' ? 'file_logo_kiri' : 'file_logo_kanan');
+    let inputId = 'file_logo_kiri';
+    if (posisi === 'right') inputId = 'file_logo_kanan';
+    else if (posisi === 'ttd_ks') inputId = 'file_ttd_ks';
+    const fileInput = document.getElementById(inputId);
     const file = fileInput?.files[0];
     if (!file) return;
     currentCropPosition = posisi;
@@ -1036,7 +1096,7 @@ function prosesUnggahLogoKeDrive(posisi) {
 function tutupModalCropper() {
     document.getElementById('modal-cropper').classList.add('hidden');
     if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
-    document.getElementById('file_logo_kiri').value = ""; document.getElementById('file_logo_kanan').value = "";
+    document.getElementById('file_logo_kiri').value = ""; document.getElementById('file_logo_kanan').value = ""; document.getElementById('file_ttd_ks').value = "";
 }
 
 function lakukanUploadLogoFinal(mimeType, base64Data, posisi) {
@@ -1044,14 +1104,19 @@ function lakukanUploadLogoFinal(mimeType, base64Data, posisi) {
     window.electronAPI.uploadFileLogo(mimeType, base64Data, posisi.toUpperCase())
         .then(function (response) {
             if (response && response.status === "SUCCESS") {
-                document.getElementById(posisi === 'left' ? 'in_logo_kiri' : 'in_logo_kanan').value = response.url;
+                if (posisi === 'left') document.getElementById('in_logo_kiri').value = response.url;
+                else if (posisi === 'right') document.getElementById('in_logo_kanan').value = response.url;
+                else if (posisi === 'ttd_ks') document.getElementById('in_ttd_ks').value = response.url;
                 if (posisi === 'right') {
                     const logoWithBuster = getLogoWithCacheBuster(response.url);
                     if (document.getElementById('brand-logo-nav')) document.getElementById('brand-logo-nav').src = logoWithBuster;
                     if (document.getElementById('app-logo-login')) document.getElementById('app-logo-login').src = logoWithBuster;
                 }
                 if (typeof updateLivePreview === "function") updateLivePreview();
-                let dataOtoSimpan = {}; dataOtoSimpan[posisi === 'left' ? "Logo_Kiri_Url" : "Logo_Kanan_Url"] = response.url;
+                let dataOtoSimpan = {}; 
+                if (posisi === 'left') dataOtoSimpan["Logo_Kiri_Url"] = response.url;
+                else if (posisi === 'right') dataOtoSimpan["Logo_Kanan_Url"] = response.url;
+                else if (posisi === 'ttd_ks') dataOtoSimpan["Ttd_Ks_Url"] = response.url;
                 window.electronAPI.simpanPengaturanKop(dataOtoSimpan).then(() => {
                     setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("success", "BERHASIL", `Logo ${posisi} diunggah.`);
                 }).catch(err => { setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast("error", "ERROR", err.toString()); });
@@ -1065,7 +1130,6 @@ function lakukanUploadLogoFinal(mimeType, base64Data, posisi) {
 function simpanKopKeDatabase() {
     setLoading(true, "Simpan Kop diproses...");
     const dataKop = {
-        "App_Name": document.getElementById('in_app_name') ? document.getElementById('in_app_name').value : "KlikSurat",
         "Kop_Daerah": document.getElementById('in_kop_daerah').value,
         "Kop_Sub_Dinas": document.getElementById('in_kop_sub').value,
         "Kop_Sekolah": document.getElementById('in_kop_sekolah').value,
@@ -1079,12 +1143,7 @@ function simpanKopKeDatabase() {
         "Margin_Atas": document.getElementById('in_margin_atas').value,
         "Margin_Bawah": document.getElementById('in_margin_bawah').value,
         "Margin_Kiri": document.getElementById('in_margin_kiri').value,
-        "Margin_Kanan": document.getElementById('in_margin_kanan').value,
-        "Kode_Provinsi": document.getElementById('in_kode_provinsi') ? document.getElementById('in_kode_provinsi').value : "35",
-        "Kode_Kabupaten": document.getElementById('in_kode_kabupaten') ? document.getElementById('in_kode_kabupaten').value : "09",
-        "Kode_Dinas": document.getElementById('in_kode_dinas') ? document.getElementById('in_kode_dinas').value : "310",
-        "Kode_Kecamatan": document.getElementById('in_kode_kecamatan') ? document.getElementById('in_kode_kecamatan').value : "24",
-        "NPSN_Sekolah": document.getElementById('in_npsn_sekolah') ? document.getElementById('in_npsn_sekolah').value.replace(/\D/g, "") : "20523730"
+        "Margin_Kanan": document.getElementById('in_margin_kanan').value
     };
     window.electronAPI.simpanPengaturanKop(dataKop).then(res => {
         setLoading(false); if (typeof tampilkanToast === "function") tampilkanToast(res.status === "SUCCESS" ? "success" : "error", res.status === "SUCCESS" ? "BERHASIL" : "GAGAL", res.message);
@@ -1130,13 +1189,6 @@ function simpanSettingsUmum() {
     const kodeKabupaten = document.getElementById('set_kode_kabupaten')?.value || "09";
     const kodeDinas = document.getElementById('set_kode_dinas')?.value || "310";
     const kodeKecamatan = document.getElementById('set_kode_kecamatan')?.value || "24";
-
-    if (document.getElementById('in_app_name')) document.getElementById('in_app_name').value = appName;
-    if (document.getElementById('in_npsn_sekolah')) document.getElementById('in_npsn_sekolah').value = npsnSekolah;
-    if (document.getElementById('in_kode_provinsi')) document.getElementById('in_kode_provinsi').value = kodeProvinsi;
-    if (document.getElementById('in_kode_kabupaten')) document.getElementById('in_kode_kabupaten').value = kodeKabupaten;
-    if (document.getElementById('in_kode_dinas')) document.getElementById('in_kode_dinas').value = kodeDinas;
-    if (document.getElementById('in_kode_kecamatan')) document.getElementById('in_kode_kecamatan').value = kodeKecamatan;
 
     const logoL = document.getElementById('in_logo_kiri').value; const logoR = document.getElementById('in_logo_kanan').value;
     if (npsnSekolah && npsnSekolah.length !== 8) { if (typeof tampilkanToast === "function") tampilkanToast("error", "NPSN TIDAK VALID", "NPSN sekolah harus berisi 8 digit angka."); return; }
@@ -1210,6 +1262,8 @@ function simpanTtdKeDatabase() {
     const modeElem = document.getElementById('in_mode_ttd'); const modeValue = modeElem ? modeElem.value : (typeof modeTtdAktif !== 'undefined' ? modeTtdAktif : "kanan-bawah");
     setLoading(true, "Menyimpan setelan TTD...");
     const dataTtd = {
+        "Ttd_Gunakan_Ttd_Ks": document.getElementById('in_tampil_ttd_ks')?.checked ? "YA" : "TIDAK",
+        "Ttd_Geser_X_Ks": document.getElementById('in_geser_ttd_x')?.value || "0",
         "Ttd_Frasa_Ditetapkan": document.getElementById('in_ttd_frasa_ditetapkan')?.value || "Ditetapkan di", "Ttd_Frasa_Tanggal": document.getElementById('in_ttd_frasa_tanggal')?.value || "Pada Tanggal",
         "Ttd_Mode_Aktif": modeValue, "Ttd_Gunakan_Foto": document.getElementById('in_ttd_foto')?.checked ? "YA" : "TIDAK",
         "Ttd_Jabatan_1": document.getElementById('p1_jabatan')?.value || "", "Ttd_Nama_1": document.getElementById('p1_nama')?.value || "", "Ttd_Pangkat_1": document.getElementById('p1_pangkat')?.value || "", "Ttd_Nip_1": document.getElementById('p1_nip')?.value || "",
@@ -1239,7 +1293,8 @@ function prosesSimpanData() {
         nomor: packNomor, tanggal: document.getElementById('in_tanggal')?.value || "", perihal: packPerihal, penerima: document.getElementById('in_penerima')?.value || "",
         lampiran: document.getElementById('in_lampiran')?.value || "", pembuka: document.getElementById('in_pembuka')?.value || "", isi: document.getElementById('in_isi')?.value || "",
         tembusan: document.getElementById('in_tembusan')?.value || "", operator: typeof userSessionName !== "undefined" ? userSessionName : "Admin",
-        serial_id: document.getElementById('in_serial_id')?.value || "-", ref_id: window.selectedSiswa?.NISN || window.selectedGuru?.NIP || ""
+        serial_id: document.getElementById('in_serial_id')?.value || "-", ref_id: window.selectedSiswa?.NISN || window.selectedGuru?.NIP || "",
+        layout: document.getElementById('in_layout_type')?.value || "standard"
     };
 
     const parts = dataSuratMurni.nomor.split('/');
@@ -2866,3 +2921,12 @@ if (window.electronAPI && window.electronAPI.onDatabaseSynced) {
         }
     });
 }
+
+// Auto-Sync saat koneksi internet pulih
+window.addEventListener('online', () => {
+    console.log("Koneksi internet terdeteksi pulih. Memulai auto-sync background...");
+    if (typeof tampilkanToast === "function") tampilkanToast("success", "ONLINE", "Internet terhubung kembali. Memulai sinkronisasi...");
+    if (window.electronAPI && window.electronAPI.sinkronisasiOtomatis) {
+        window.electronAPI.sinkronisasiOtomatis().catch(err => console.error("Auto-sync error:", err));
+    }
+});

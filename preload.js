@@ -46,8 +46,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onSyncStatus: (callback) => ipcRenderer.on('sync-status', (event, status, message) => callback(status, message)),
     ambilPrinters: () => ipcRenderer.invoke('ambil-printers'),
     generatePdfPreview: () => ipcRenderer.invoke('generate-pdf-preview'),
+    simpanSebagaiPdf: (defaultName) => ipcRenderer.invoke('simpan-sebagai-pdf', defaultName),
     printDokumenKustom: (printerName, copies) => ipcRenderer.invoke('print-dokumen-kustom', printerName, copies),
     onUpdateAvailable: (callback) => ipcRenderer.on('update_available', () => callback()),
     onUpdateDownloaded: (callback) => ipcRenderer.on('update_downloaded', () => callback()),
+    sinkronisasiOtomatis: () => ipcRenderer.invoke('sinkronisasi-otomatis'),
     restartApp: () => ipcRenderer.invoke('restart_app'),
 });
