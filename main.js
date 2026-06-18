@@ -706,6 +706,9 @@ app.whenReady().then(async () => {
         autoUpdater.on('update-available', () => {
             if(mainWindow) mainWindow.webContents.send('update_available');
         });
+        autoUpdater.on('download-progress', (progressObj) => {
+            if(mainWindow) mainWindow.webContents.send('update_progress', progressObj);
+        });
         autoUpdater.on('update-downloaded', () => {
             if(mainWindow) mainWindow.webContents.send('update_downloaded');
         });

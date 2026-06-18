@@ -2894,7 +2894,49 @@ if (window.electronAPI && window.electronAPI.onUpdateAvailable) {
         }
     });
 
+    if (window.electronAPI.onUpdateProgress) {
+        window.electronAPI.onUpdateProgress((progressObj) => {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            let progressToast = document.getElementById('update-progress-toast');
+            if (!progressToast) {
+                progressToast = document.createElement('div');
+                progressToast.id = 'update-progress-toast';
+                progressToast.className = `pointer-events-auto flex flex-col p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-brand-blue/30 shadow-xl transition-all duration-300 dark:bg-slate-800 dark:border-slate-700`;
+                container.appendChild(progressToast);
+            }
+            
+            const percent = Math.round(progressObj.percent || 0);
+            const speed = (progressObj.bytesPerSecond / (1024 * 1024)).toFixed(2); // MB/s
+            const transferred = (progressObj.transferred / (1024 * 1024)).toFixed(2);
+            const total = (progressObj.total / (1024 * 1024)).toFixed(2);
+            
+            progressToast.innerHTML = `
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center">
+                        <i class="fa-solid fa-cloud-arrow-down text-brand-blue dark:text-blue-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h5 class="text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200">Mengunduh Pembaruan...</h5>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${transferred} MB / ${total} MB (${speed} MB/s)</p>
+                    </div>
+                    <div class="font-bold text-brand-blue dark:text-blue-400 text-sm">${percent}%</div>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-brand-blue dark:bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width: ${percent}%"></div>
+                </div>
+            `;
+        });
+    }
+
     window.electronAPI.onUpdateDownloaded(() => {
+        const progressToast = document.getElementById('update-progress-toast');
+        if (progressToast) {
+            progressToast.classList.add('opacity-0', 'translate-x-full');
+            setTimeout(() => progressToast.remove(), 300);
+        }
+
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'Pembaruan Siap!',
